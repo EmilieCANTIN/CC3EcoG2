@@ -1,9 +1,396 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "Importation des données "
+output:
+  github_document:
+    toc: true
+    toc_depth: 2
 ---
 
+# Importation des données de ENA
+
 ```{bash}
-wget -i R1_fastq 
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865259/ERR1865259_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865259/ERR1865259_2.fastq.gz
 ```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865260/ERR1865260_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865260/ERR1865260_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865261/ERR1865261_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865261/ERR1865261_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865262/ERR1865262_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865262/ERR1865262_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865263/ERR1865263_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865263/ERR1865263_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865264/ERR1865264_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865264/ERR1865264_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865265/ERR1865265_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865265/ERR1865265_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865266/ERR1865266_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865266/ERR1865266_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865267/ERR1865267_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865267/ERR1865267_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865268/ERR1865268_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865268/ERR1865268_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865269/ERR1865269_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865269/ERR1865269_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865270/ERR1865270_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865270/ERR1865270_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865271/ERR1865271_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865271/ERR1865271_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865272/ERR1865272_1.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865272/ERR1865272_2.fastq.gz
+```
+
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865273/ERR1865273_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865273/ERR1865273_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865274/ERR1865274_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865274/ERR1865274_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865275/ERR1865275_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865275/ERR1865275_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865276/ERR1865276_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865276/ERR1865276_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865277/ERR1865277_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865277/ERR1865277_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865278/ERR1865278_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865278/ERR1865278_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865279/ERR1865279_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865279/ERR1865279_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865280/ERR1865280_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865280/ERR1865280_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865281/ERR1865281_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865281/ERR1865281_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865282/ERR1865282_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865282/ERR1865282_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865283/ERR1865283_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865283/ERR1865283_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865284/ERR1865284_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865284/ERR1865284_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865285/ERR1865285_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865285/ERR1865285_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865286/ERR1865286_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865286/ERR1865286_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865287/ERR1865287_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865287/ERR1865287_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865288/ERR1865288_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865288/ERR1865288_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865289/ERR1865289_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865289/ERR1865289_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865290/ERR1865290_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865290/ERR1865290_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865291/ERR1865291_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865291/ERR1865291_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865292/ERR1865292_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865292/ERR1865292_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865293/ERR1865293_1.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865293/ERR1865293_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865294/ERR1865294_1.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865294/ERR1865294_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865295/ERR1865295_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865295/ERR1865295_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865296/ERR1865296_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865296/ERR1865296_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865297/ERR1865297_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865297/ERR1865297_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865298/ERR1865298_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865298/ERR1865298_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865299/ERR1865299_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865299/ERR1865299_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865300/ERR1865300_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865300/ERR1865300_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865301/ERR1865301_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865301/ERR1865301_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865302/ERR1865302_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865302/ERR1865302_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865303/ERR1865303_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865303/ERR1865303_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865304/ERR1865304_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865304/ERR1865304_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865305/ERR1865305_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865305/ERR1865305_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865306/ERR1865306_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865306/ERR1865306_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865307/ERR1865307_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865307/ERR1865307_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865308/ERR1865308_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865308/ERR1865308_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865309/ERR1865309_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865309/ERR1865309_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865310/ERR1865310_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865310/ERR1865310_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865311/ERR1865311_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865311/ERR1865311_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865312/ERR1865312_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865312/ERR1865312_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865313/ERR1865313_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865313/ERR1865313_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865314/ERR1865314_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865314/ERR1865314_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865315/ERR1865315_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865315/ERR1865315_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865316/ERR1865316_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865316/ERR1865316_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865317/ERR1865317_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865317/ERR1865317_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865318/ERR1865318_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865318/ERR1865318_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865319/ERR1865319_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865319/ERR1865319_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865320/ERR1865320_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/000/ERR1865320/ERR1865320_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865321/ERR1865321_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/001/ERR1865321/ERR1865321_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865322/ERR1865322_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/002/ERR1865322/ERR1865322_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865323/ERR1865323_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/003/ERR1865323/ERR1865323_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865324/ERR1865324_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/004/ERR1865324/ERR1865324_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865325/ERR1865325_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/005/ERR1865325/ERR1865325_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865326/ERR1865326_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/006/ERR1865326/ERR1865326_2.fastq.gz
+```
+
+```{bash, results='hide'}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865327/ERR1865327_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/007/ERR1865327/ERR1865327_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865328/ERR1865328_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/008/ERR1865328/ERR1865328_2.fastq.gz
+```
+
+```{bash}
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865329/ERR1865329_1.fastq.gz
+wget ftp.sra.ebi.ac.uk/vol1/fastq/ERR186/009/ERR1865329/ERR1865329_2.fastq.gz
+```
+
+Ou bien ...
+```{bash}
+wget -i R1_fastq  
+```
+
+# Décompression des données
+
+Avec gunzip *.gz dans le terminal
+
+# Attribuer une taxonomie
+
+```{bash}
+wget https://zenodo.org/record/3986799/files/silva_nr99_v138_train_set.fa.gz
+```
+
+
+
+
+
+
 

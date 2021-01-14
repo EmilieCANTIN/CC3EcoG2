@@ -1,8 +1,233 @@
 ---
 title: "Analyse_des_données"
-output: github_document:
-  toc: true
-  toc_deapth: 2
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
 ---
+
+Cette étude porte sur les données de l'article "Changements dans la composition des procaryotes marins avec la saison et la profondeur au cours d'une année polaire arctique" publié par Wilson et al en 2017.
+
+# Méthodes
+
+## Des lectures aux tableaux
+
+Ce premier code permet d’importer les données de l’étude, à partir d’un ensemble de fichiers fastq. Ici, on définit une variable chemin path, afin de pouvoir accéder à ces données.
+
+```{r, results='hide'}
+path <- "~/CC3EcoG2/donnees_CC3" # MODIFIER le répertoire contenant les fichiers fastq après la décompression
+list.files(path)
+```
+
+## Filtrer les données
+
+On filtre les séquences de faible qualité, puis on les enlève. On demande ici d’afficher les “moins bons”.
+
+```{r}
+# Le tri permet de s'assurer que les lectures en avant et en arrière sont dans le même ordre
+fnFs <- sort(list.files(path, pattern="_1.fastq"))
+fnRs <- sort(list.files(path, pattern="_2.fastq"))
+# Extract sample names, assuming filenames have format: SAMPLENAME_XXX.fastq
+sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
+# Specify the full path to the fnFs and fnRs
+fnFs <- file.path(path, fnFs)
+fnRs <- file.path(path, fnRs)
+```
+
+On sait que plus on se rapproche de la fin des séquençages, moins bonne sera leur qualité. En effet, on remarque que pour les lectures avant (deux premiers graphes), le score de qualité moyen ne descend jamais en dessous de 30. Au contraire, les graphes incarnant la fin des lectures montrent un score de qualité plus bas (~25). Ce type de chiffre représente la probabilité que ce ne soit pas le bon nucléotide d’appelé. De ce fait, avec un Q30 en début de séquences, il y a une chance sur 1000 que ce soit le cas.
+
+```{r}
+library(dada2)
+plotQualityProfile(fnFs[1:2])
+```
+
+```{r}
+plotQualityProfile(fnRs[1:2])
+```
+
+On voit bien ici la moins bonne qualité des fins de séquences. En effet, les scores de qualités baissent vers la position 220 pour les lectures arrières, si on est extremement sélectifs. Néanmoins, de manière générale, ces séquences sont de très bonne qualité.
+En prenant ces informations en compte, on va pouvoir dans un premier temps créer des variables pour les fichiers filtrés, puis appliquer la fonction filterAndTrim.
+
+```{r}
+filt_path <- file.path(path, "filtered") # Placez les fichiers filtrés dans le sous-répertoire "filtered"
+if(!file_test("-d", filt_path)) dir.create(filt_path)
+filtFs <- file.path(filt_path, paste0(sample.names, "_F_filt.fastq.gz"))
+filtRs <- file.path(filt_path, paste0(sample.names, "_R_filt.fastq.gz"))
+names(filtFs) <- sample.names
+names(filtRs) <- sample.names
+sample.names
+```
+
+## Filtrez les lectures en amont et en aval
+
+cf trimLeft=c(21,21) On pourrait aussi utiliser ce code pour retirer les primers.
+
+Cette fonction se base sur des fichiers contenant les lectures coupées ayant passées les filtres. "TrimLeft" permet de retirer les primers afin de ne pas les intégrer aux séquences étudiées. Le choix 240,240 pour truncLen a été fait car nos données sont de manière générale de très bonne qualité.
+
+```{r}
+library(dada2)
+out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240, 240),
+              maxEE=c(2,2), rm.phix=TRUE,
+              compress=TRUE, multithread=TRUE)
+head(out)
+```
+
+# Connaitre les taux d'erreurs
+
+Ci-dessous, la fonction learnErrors permet d’estimer les taux d’erreurs à partir d’un grand ensemble de données. Ainsi, les résultats ci-après expriment le nombre de bases qui sera finalement utilisé, par rapport au premier ensemble.
+
+```{r warning=TRUE}
+errF <- learnErrors(filtFs, multithread=TRUE)
+```
+
+```{r}
+errR <- learnErrors(filtRs, multithread=TRUE)
+```
+
+```{r warning=TRUE}
+plotErrors(errR, nominalQ=TRUE)
+```
+
+```{r warning=TRUE}
+library(ggplot2)
+library(dada2)
+plotErrors(errF, nominalQ=TRUE)
+```
+
+Les figures ci-dessus représentent les estimations des taux d’erreurs en fonction du score de qualité. La ligne rouge incarne la tendance générale du graphique. Ensuite, les points noirs reflètent le taux d’erreurs observées, et la ligne noire le taux d’erreurs ajustées. On peut donc observer ci-dessus la fréquence du taux d’erreur en fonction du score de qualité. Aucune différence significative ne peut être relevée entre errR et errF. En effet, on observe la même tendance : moins il y a d’erreurs, plus le score de qualité augmente, ce qui est en accord avec les résultats attendus.
+
+## Exemple d'inférence
+
+La fonction dada retire les erreurs de séquençage et renvoie la composition déduite des échantillons.
+
+```{r}
+dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
+```
+
+```{r}
+dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
+```
+
+# Fusions des lectures et élimination des chimères
+
+```{r}
+mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
+# Inspecter le fichier "merger data.frame" du premier échantillon
+head(mergers[[1]])
+```
+
+## Construire un tableau séquentiel
+
+```{r warning=TRUE}
+seqtab <- makeSequenceTable(mergers)
+# Récupérer ou définir la dimension d'un objet
+dim(seqtab)
+```
+
+```{r}
+# Contrôler la distribution des longueurs de séquence
+table(nchar(getSequences(seqtab)))
+```
+
+Ici, il supprime les séquences reproduites en comparant chaque séquence aux autres.
+
+## Supprimer les chimères
+
+```{r}
+library(dada2)
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+dim(seqtab.nochim)
+```
+
+On peut donc dire que les chimères représentent environ ...% des variantes de séquences.
+
+```{r}
+sum(seqtab.nochim)/sum(seqtab)
+```
+
+Il y a environ 61% de chimères, ce qui peut paraitre énorme.
+
+# Attribuer une taxonomie
+
+```{r}
+library(dada2)
+taxa <- assignTaxonomy(seqtab.nochim, "~/silva_nr99_v138_train_set.fa.gz", multithread=TRUE)
+```
+
+```{r}
+taxa.print <- taxa # Suppression des noms de séquences uniquement pour l'affichage
+rownames(taxa.print) <- NULL
+head(taxa.print)
+```
+
+# Regroupement des données de la diversité procaryotique en mois
+
+```{r warning=TRUE}
+samples.out <- rownames(seqtab.nochim)
+profondeur <- sapply(strsplit(samples.out, "D"), `[`, 1)
+mois <- substr(profondeur,0,71)
+samdf <- data.frame(Profondeur=profondeur, Mois=mois)
+rownames(samdf) <- samples.out
+```
+
+```{r}
+samdf$mois[samdf$Profondeur>71] <- c("janvier","mars","mai","aout","novembre")
+samdf$Profondeur[samdf$Mois>71] <- c("1m","20m","120m","500m","1000m","0m","320m","10m","447m","15m","451m","18m","215m","25m","750m","300m","5m")
+```
+
+On crée ici un fichier csv afin d'ordonner les paramètres à la main, ce qui peut paraitre moins loin que de créer plusieurs codes.
+
+```{r}
+write.csv(samdf,"samdf.csv")
+```
+
+```{r}
+# Importation des données dans l'objet samdf
+samdf <-read.table('~/CC3EcoG2/samdf.csv', sep=',', header=TRUE, row.names=1)
+```
+
+## Combiner les données dans un objet phyloseq
+
+L'objet ps nous servira notamment pour les codes incarnant la PCoA.
+
+```{r}
+library(phyloseq)
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+               sample_data(samdf), 
+               tax_table(taxa))
+ps
+```
+Cela signifie donc que l'objet ps comporte 11832 taxons répartis sur 71 échantillons.
+
+
+# Diversité taxonomique et abondances relatives
+
+-> création d'histogrammes de la profondeur en fonction de l'abondance, avec un histogramme pour chaque mois
+
+# Analyse en Composantes Principales (PCoA)
+
+```{r}
+pslog <- transform_sample_counts(ps, function(x) log(1 + x))
+out.wuf.log <- ordinate(pslog, method = "PCoA", distance = "bray")
+```
+
+```{r}
+library(ggplot2)
+evals <- out.wuf.log$values$Eigenvalues
+plot_ordination(pslog, out.wuf.log, color = "Profondeur", shape="Mois") +
+  labs(col = "Profondeur",shape= "Mois")
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
