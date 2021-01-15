@@ -139,7 +139,7 @@ seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE
 dim(seqtab.nochim)
 ```
 
-On peut donc dire que les chimères représentent environ ...% des variantes de séquences.
+On peut donc dire que les chimères représentent environ plus de la moitié des variantes de séquences.
 
 ```{r}
 sum(seqtab.nochim)/sum(seqtab)
@@ -148,6 +148,8 @@ sum(seqtab.nochim)/sum(seqtab)
 Il y a environ 61% de chimères, ce qui peut paraitre énorme.
 
 # Attribuer une taxonomie
+
+On va ici assigner une taxonomie aux données de cette étude à partir de ce qu'on pourra observer de Silva. De cette manière, les codes ci-dessous permettent de visualiser les différents genres présents dans le microbiome procaryotique arctique.
 
 ```{r}
 library(dada2)
@@ -160,26 +162,31 @@ rownames(taxa.print) <- NULL
 head(taxa.print)
 ```
 
+On peut toutefois noter des différences entre les résultats affichés ci-dessus et les marqueurs procaryotiques utilisés dans l'article. Nos lignes de codes marquent la classe des gammaprotéobactéries comme particulièrement présente, ensuite celle des Nitrososphaeria alors que les auteurs de l'étude en question vont beaucoup plus loin.
+Cela signifie que les codes utilisés ici ne reflètent pas exactement l'exact diversité étudiée par Wilson et al; il faudrait encore les modifier.
+
 # Regroupement des données de la diversité procaryotique en mois
 
 ```{r warning=TRUE}
 samples.out <- rownames(seqtab.nochim)
-profondeur <- sapply(strsplit(samples.out, "D"), `[`, 1)
-mois <- substr(profondeur,0,71)
-samdf <- data.frame(Profondeur=profondeur, Mois=mois)
+Profondeur <- sapply(strsplit(samples.out, "D"), `[`, 1)
+Mois <- substr(Profondeur,0,71)
+samdf <- data.frame(Profondeur=Profondeur, Mois=Mois)
 rownames(samdf) <- samples.out
 ```
 
+Au vu de l'article de Wilson et al, il pourrait aussi etre judicieux de créer un autre paramètre. En effet, les auteurs ont étudié le microbiome arctique dans différentes stations, stations qui apparaissent aussi dans la mise en forme des résultats.
+
 ```{r}
-samdf$mois[samdf$Profondeur>71] <- c("janvier","mars","mai","aout","novembre")
-samdf$Profondeur[samdf$Mois>71] <- c("1m","20m","120m","500m","1000m","0m","320m","10m","447m","15m","451m","18m","215m","25m","750m","300m","5m")
+samdf$Mois[samdf$Profondeur>71] <- c("janvier","mars","mai","aout","novembre")
+samdf$Profondeur[samdf$Mois>71] <- c("1m","20m","120m","500m","1000m","0m","10m","25m","300m","5m","200m","365m","375m","75m","320m")
 ```
 
-On crée ici un fichier csv afin d'ordonner les paramètres à la main, ce qui peut paraitre moins loin que de créer plusieurs codes.
+Les paramètres crées ici permettront de discriminer la diversité procaryotique en fonction des saisons et de la profondeur.
+On crée ici un fichier csv afin d'ordonner ces paramètres à la main, ce qui peut paraitre moins long que de créer plusieurs codes.
+Pour les besoins de la mise en forme, la ligne de code ci-dessous n'est pas sous le format que l'on pourrait attendre d'un code sous R.
 
-```{r}
 write.csv(samdf,"samdf.csv")
-```
 
 ```{r}
 # Importation des données dans l'objet samdf
@@ -188,7 +195,7 @@ samdf <-read.table('~/CC3EcoG2/samdf.csv', sep=',', header=TRUE, row.names=1)
 
 ## Combiner les données dans un objet phyloseq
 
-L'objet ps nous servira notamment pour les codes incarnant la PCoA.
+L'objet ps nous servira notamment pour les codes incarnant la PCoA. Il nous renseigne sur l'assignation taxonomique et le nombre de séquences identifiées, et ce pour chaque échantillon.
 
 ```{r}
 library(phyloseq)
@@ -199,26 +206,52 @@ ps
 ```
 Cela signifie donc que l'objet ps comporte 11832 taxons répartis sur 71 échantillons.
 
-
 # Diversité taxonomique et abondances relatives
 
 -> création d'histogrammes de la profondeur en fonction de l'abondance, avec un histogramme pour chaque mois
 
+```{r}
+ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows=FALSE), 
+               sample_data(samdf), 
+               tax_table(taxa))
+ps <- prune_samples(sample_names(ps) != "Mock", ps) # Remove mock sample
+```
+
+```{r}
+dna <- Biostrings::DNAStringSet(taxa_names(ps))
+names(dna) <- taxa_names(ps)
+ps <- merge_phyloseq(ps, dna)
+taxa_names(ps) <- paste0("ASV", seq(ntaxa(ps)))
+ps
+```
+
+```{r}
+top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:71742]
+ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU))
+ps.top20 <- prune_taxa(top20, ps.top20)
+plot_bar(ps.top20, y="Profondeur", x="Abundance", fill="Class") + facet_wrap(~Mois, scales="free_x")
+```
+
+Les graphes ci-dessus incarnent la profondeur en fonction de l'abondance des différentes classes procaryotiques présentes sur les sites étudiés. Par exemple, on peut ici noter que les gammaprotéobactéries semblent particulièrement en mai. On relève que certaines classes sont parfois très représentées à une certaine profondeur/période quand d'autres fois pas du tout. Ces paramètres paraissent donc de bons indicateurs de diversité procaryotique. 
+Néanmoins, les histogrammes crées ici ne peuvent pas permettre une étude correcte de la diversité procaryotique arctique. En effet, par rapport à ceux de l'article, les différentes stations dans lesquels ont été recueillis les échantillons n'apparaissent pas. De ce fait, la compréhension des résultats affichés ne peut etre optimale. En effet, pourquoi y aurait il alors indications de profondeurs dans le "désordre"? Ces codes ci-dessus sont donc aussi à modifier.
+
 # Analyse en Composantes Principales (PCoA)
 
 ```{r}
-pslog <- transform_sample_counts(ps, function(x) log(1 + x))
-out.wuf.log <- ordinate(pslog, method = "PCoA", distance = "bray")
+ps.prop <- transform_sample_counts(ps, function(x) log(1 + x))
+ord.pcoa.bray <- ordinate(pslog, method = "PCoA", distance = "bray")
 ```
 
 ```{r}
 library(ggplot2)
-evals <- out.wuf.log$values$Eigenvalues
-plot_ordination(pslog, out.wuf.log, color = "Profondeur", shape="Mois") +
+evals <- ord.pcoa.bray$values$Eigenvalues
+plot_ordination(ps.prop, ord.pcoa.bray, color = "Profondeur", shape="Mois") +
   labs(col = "Profondeur",shape= "Mois")
 ```
 
-
+Dans un dernier temps, nous avons chercher à représenter la diversité procaryotique par une PCoA. Or, la différenciation des séquences de zone photique et mésopélagique n'apparait pas sur ce graphique. Dès lors, il semble ici qu'il n'y ai aucune réelle différenciation de communauté bactérienne, alors que ce n'est pas le cas. 
+En effet, les auteurs de l'article ont bien marqué par leur PCoA une particulière différenciation de communautés dans ces deux zones spécifiques. 
+Pour mieux comprendre l'étendue de la diversité procaryotique étudiée, il faut donc plus se reférer à l'article à la base de cette étude.
 
 
 
