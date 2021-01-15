@@ -1,0 +1,10 @@
+---
+title: "Installation"
+output:
+  github_document:
+---
+
+```{r}
+install.packages("R.utils")
+```
+
