@@ -239,7 +239,7 @@ Néanmoins, les histogrammes crées ici ne peuvent pas permettre une étude corr
 
 ```{r}
 ps.prop <- transform_sample_counts(ps, function(x) log(1 + x))
-ord.pcoa.bray <- ordinate(pslog, method = "PCoA", distance = "bray")
+ord.pcoa.bray <- ordinate(ps.prop, method = "PCoA", distance = "bray")
 ```
 
 ```{r}
